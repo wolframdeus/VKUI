@@ -132,6 +132,6 @@
     "test:static"
   ],
   "resolutions": {
-    "watchpack": ">=1.7.2"
+    "watchpack": "^1.7.2"
   }
 }
