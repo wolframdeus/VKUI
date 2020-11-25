@@ -12,11 +12,10 @@ jobs:
           node-version: 12
       - uses: bahmutov/npm-install@v1
       - run: yarn test:ci
-      - run: yarn test:e2e
       - name: Danger
         if: always()
         run: yarn danger ci
-        env: 
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   styleguide:
     runs-on: ubuntu-latest
