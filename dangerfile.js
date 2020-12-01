@@ -1,6 +1,7 @@
 import { fail, message, warn, danger, markdown } from 'danger';
 const dangerJest = require('danger-plugin-jest').default;
 const { readFile } = require('fs').promises;
+const md5 = require('md5');
 const path = require('path');
 const glob = require('glob');
 const { promisify } = require('util')
@@ -47,13 +48,15 @@ const s3 = new AWS.S3({
 async function uploadFailedScreenshots() {
   const diffDir = '__diff_output__'
   const { github } = danger;
-  const pathPrefix = github ? github.pr.number : 'local';
+  const pathPrefix = github ? String(github.pr.number) : 'local';
+  await removeDiffs(`${pathPrefix}/`);
   for (const failedScreen of await pglob(path.join(__dirname, '**', diffDir, '*.png'))) {
-    const screenName = path.parse(failedScreen).base;
-    const key = [pathPrefix, screenName].join('/');
+    const screenName = path.parse(failedScreen).name;
+    const fileContents = await readFile(failedScreen);
+    const key = `${pathPrefix}/${screenName}-${md5(fileContents)}.png`;
     try {
       await s3.putObject({
-        Body: await readFile(failedScreen),
+        Body: fileContents,
         Bucket: UPLOAD_BUCKET,
         Key: key,
         ContentType: 'image/png',
@@ -68,6 +71,21 @@ async function uploadFailedScreenshots() {
     } catch (err) {
       console.log('Screenshot diff upload failed', err.message);
     }
+  }
+}
+
+async function removeDiffs(prefix) {
+  const list = (await s3.listObjects({
+    Bucket: UPLOAD_BUCKET,
+    Prefix: prefix,
+  }).promise()).Contents;
+  if (list && list.length !== 0) {
+    await s3.deleteObjects({
+      Bucket: UPLOAD_BUCKET,
+      Delete: {
+        Objects: list.map(obj => ({ Key: obj.Key })),
+      },
+    }).promise();
   }
 }
 
