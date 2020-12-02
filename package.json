@@ -106,6 +106,7 @@
   "scripts": {
     "prepare": "yarn build",
     "styleguide": "cross-env NODE_ENV=development styleguidist server --config=styleguide/config.js",
+    "styleguide:profiling": "cross-env NODE_ENV=production styleguidist server --config=styleguide/config.js --profiling",
     "styleguide:build": "cross-env NODE_ENV=production styleguidist build --config=styleguide/config.js",
     "dev": "yarn clear && yarn copy-default-scheme && concurrently \"yarn:tsc-dev\" \"yarn:babel-dev\" \"yarn:postcss-dev\" \"yarn:postcss-unstable-dev\"",
     "dev-es6": "yarn clear && yarn copy-default-scheme && concurrently \"yarn:tsc-es6-dev\" \"yarn:babel-es6-dev\" \"yarn:postcss-dev\" \"yarn:postcss-unstable-dev\"",

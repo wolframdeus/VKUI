@@ -238,9 +238,12 @@ module.exports = {
       }),
     ],
     resolve: {
-      alias: {
-        'rsg-components/Preview': path.join(__dirname, './Components/Preview')
-      }
+      alias: Object.assign({
+        'rsg-components/Preview': path.join(__dirname, './Components/Preview'),
+      }, argv.profiling ? {
+        'react-dom$': 'react-dom/profiling',
+        'scheduler/tracing': 'scheduler/tracing-profiling',
+      } : {}),
     }
   })
 };
