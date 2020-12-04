@@ -54,7 +54,7 @@ const ChipsSelect: FC<ChipsSelectProps<ChipsInputOption>> = <Option extends Chip
     ...restProps
   } = props;
 
-  const scrollViewRef = useRef<CustomScrollView>(null);
+  const scrollViewRef = useRef<InstanceType<typeof CustomScrollView>>(null);
   const {
     fieldValue, selectedOptions, opened, setOpened, addOptionFromInput,
     filteredOptions, addOption, handleInputChange, clearInput,

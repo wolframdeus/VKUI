@@ -6,6 +6,7 @@ import { useBrowserInfo } from '../../hooks/useBrowserInfo';
 import usePlatform from '../../hooks/usePlatform';
 import { System } from '../../lib/browser';
 import { useIsomorphicLayoutEffect } from '../../lib/useIsomorphicLayoutEffect';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface UsersStackProps extends HTMLAttributes<HTMLDivElement> {
   /**
@@ -27,13 +28,13 @@ export interface UsersStackProps extends HTMLAttributes<HTMLDivElement> {
   visibleCount?: number;
 }
 
-const UsersStack: FC<UsersStackProps> = (props) => {
+const UsersStack: FC<UsersStackProps> = withFrame((props: UsersStackProps & FrameProps) => {
   const { system, systemVersion } = useBrowserInfo();
   const platform = usePlatform();
   const { className, photos, visibleCount, size, layout, children, ...restProps } = props;
 
   useIsomorphicLayoutEffect(() => {
-    createMasks();
+    createMasks(props.document);
   }, []);
 
   const othersCount = Math.max(0, photos.length - visibleCount);
@@ -85,7 +86,7 @@ const UsersStack: FC<UsersStackProps> = (props) => {
       }
     </div>
   );
-};
+});
 
 UsersStack.defaultProps = {
   photos: [],

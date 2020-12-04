@@ -1,5 +1,4 @@
 import React, { PureComponent, RefObject } from 'react';
-import PropTypes, { Requireable } from 'prop-types';
 import Touch, { TouchProps, TouchEvent } from '../Touch/Touch';
 import TouchRootContext from '../Touch/TouchContext';
 import FixedLayout from '../FixedLayout/FixedLayout';
@@ -11,6 +10,7 @@ import withPlatform from '../../hoc/withPlatform';
 import { AnyFunction, HasPlatform } from '../../types';
 import { canUseDOM } from '../../lib/dom';
 import { runTapticImpactOccurred } from '../../lib/taptic';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface PullToRefreshProps extends TouchProps, HasPlatform {
   /**
@@ -35,11 +35,6 @@ export interface PullToRefreshState {
   spinnerY: PullToRefreshParams['start'];
   spinnerProgress: number;
   contentShift: number;
-}
-
-export interface PullToRefreshContext {
-  document: Requireable<{}>;
-  window: Requireable<{}>;
 }
 
 export interface PullToRefreshParams {
@@ -68,7 +63,7 @@ function cancelEvent(event: any) {
   return false;
 }
 
-class PullToRefresh extends PureComponent<PullToRefreshProps, PullToRefreshState> {
+class PullToRefresh extends PureComponent<PullToRefreshProps & FrameProps, PullToRefreshState> {
   constructor(props: PullToRefreshProps) {
     super(props);
 
@@ -102,23 +97,11 @@ class PullToRefresh extends PureComponent<PullToRefreshProps, PullToRefreshState
 
   contentRef: RefObject<HTMLDivElement>;
 
-  static contextTypes: PullToRefreshContext = {
-    window: PropTypes.any,
-    document: PropTypes.any,
-  };
-
-  get document() {
-    return this.context.document || document;
-  }
-
-  get window() {
-    return this.context.window || window;
-  }
-
   componentDidMount() {
     if (canUseDOM) {
-      this.document.addEventListener('touchmove', this.onWindowTouchMove, {
-        cancelable: true,
+      this.props.document.addEventListener('touchmove', this.onWindowTouchMove, {
+        // NOTE: why was it here?
+        // cancelable: true,
         passive: false,
       });
     }
@@ -129,10 +112,11 @@ class PullToRefresh extends PureComponent<PullToRefreshProps, PullToRefreshState
     // некоторые браузеры на странных вендорах типа Meizu не удаляют обработчик.
     // https://github.com/VKCOM/VKUI/issues/444
     if (canUseDOM) {
-      this.document.removeEventListener('touchmove', this.onWindowTouchMove, {
-        cancelable: true,
+      this.props.document.removeEventListener('touchmove', this.onWindowTouchMove, {
+        // NOTE: why was it here?
+        // cancelable: true,
         passive: false,
-      });
+      } as any);
     }
   }
 
@@ -159,7 +143,7 @@ class PullToRefresh extends PureComponent<PullToRefreshProps, PullToRefreshState
   onTouchMove: TouchEventHandler = (e: TouchEvent) => {
     const { isY, shiftY } = e;
     const { start, max } = this.params;
-    const pageYOffset = this.window.pageYOffset;
+    const pageYOffset = this.props.window.pageYOffset;
 
     const { refreshing, watching, touchDown } = this.state;
 
@@ -301,4 +285,4 @@ class PullToRefresh extends PureComponent<PullToRefreshProps, PullToRefreshState
   }
 }
 
-export default withPlatform(PullToRefresh);
+export default withPlatform(withFrame(PullToRefresh));

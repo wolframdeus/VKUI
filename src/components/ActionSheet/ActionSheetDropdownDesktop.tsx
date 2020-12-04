@@ -4,8 +4,8 @@ import classNames from '../../lib/classNames';
 import withPlatform from '../../hoc/withPlatform';
 import { HasPlatform } from '../../types';
 import { PointerEventsProperty } from 'csstype';
-import PropTypes from 'prop-types';
 import withAdaptivity, { AdaptivityProps } from '../../hoc/withAdaptivity';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 interface Props extends HasPlatform, AdaptivityProps {
   closing: boolean;
@@ -16,7 +16,7 @@ interface Props extends HasPlatform, AdaptivityProps {
 
 type ClickHandler = (event: React.MouseEvent<HTMLDivElement>) => void;
 
-class ActionSheetDropdownDesktop extends Component<Props> {
+class ActionSheetDropdownDesktop extends Component<Props & FrameProps> {
   state = {
     dropdownStyles: {
       left: '0',
@@ -26,22 +26,14 @@ class ActionSheetDropdownDesktop extends Component<Props> {
     },
   };
 
-  static contextTypes = {
-    window: PropTypes.any,
-  };
-
-  get window(): Window {
-    return this.context.window || window;
-  }
-
   componentDidMount = () => {
-    const { toggleRef, elementRef } = this.props;
+    const { toggleRef, elementRef, window } = this.props;
 
     const toggleRect = toggleRef.getBoundingClientRect();
     const elementRect = elementRef.current.getBoundingClientRect();
 
-    const left = toggleRect.left + toggleRect.width - elementRect.width + this.window.pageXOffset;
-    const top = toggleRect.top + toggleRect.height + this.window.pageYOffset;
+    const left = toggleRect.left + toggleRect.width - elementRect.width + window.pageXOffset;
+    const top = toggleRect.top + toggleRect.height + window.pageYOffset;
 
     this.setState({
       dropdownStyles: {
@@ -53,12 +45,12 @@ class ActionSheetDropdownDesktop extends Component<Props> {
     });
 
     setTimeout(() => {
-      this.window.addEventListener('click', this.handleClickOutside);
+      this.props.window.addEventListener('click', this.handleClickOutside);
     });
   };
 
   componentWillUnmount = () => {
-    this.window.removeEventListener('click', this.handleClickOutside);
+    this.props.window.removeEventListener('click', this.handleClickOutside);
   };
 
   handleClickOutside = (e: MouseEvent) => {
@@ -95,6 +87,6 @@ class ActionSheetDropdownDesktop extends Component<Props> {
   }
 }
 
-export default withAdaptivity(withPlatform(ActionSheetDropdownDesktop), {
+export default withAdaptivity(withPlatform(withFrame(ActionSheetDropdownDesktop)), {
   sizeY: true,
 });

@@ -36,6 +36,7 @@ function resolveInsets(e: BridgeEvent): Insets | null {
 vkBridge.subscribe((e: BridgeEvent) => {
   const insets = resolveInsets(e);
   if (insets) {
+    // eslint-disable-next-line no-restricted-globals
     const htmlElement = window.document.documentElement;
     for (let key in insets) {
       if (insets.hasOwnProperty(key) && insets[key as keyof Insets] > 0) {

@@ -1,6 +1,5 @@
 import React, {
   ChangeEventHandler,
-  FC,
   ReactNode,
   useEffect,
   useRef,
@@ -11,6 +10,7 @@ import { hasReactNode, isFunction, setRef } from '../../lib/utils';
 import { classNames } from '../../lib/classNames';
 import { getClassName } from '../../helpers/getClassName';
 import { HasRef, HasRootRef } from '../../types';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface WriteBarProps extends TextareaHTMLAttributes<HTMLTextAreaElement>, HasRootRef<HTMLDivElement>, HasRef<HTMLTextAreaElement> {
   /**
@@ -33,7 +33,7 @@ export interface WriteBarProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
   children?: never;
 }
 
-export const WriteBar: FC<WriteBarProps> = (props) => {
+export const WriteBar = withFrame((props: WriteBarProps & FrameProps) => {
   const platform = usePlatform();
   const {
     className,
@@ -49,6 +49,7 @@ export const WriteBar: FC<WriteBarProps> = (props) => {
     getRootRef,
     getRef,
     onHeightChange,
+    window,
     ...restProps
   } = props;
 
@@ -144,4 +145,4 @@ export const WriteBar: FC<WriteBarProps> = (props) => {
       </form>
     </div>
   );
-};
+});

@@ -1,36 +1,18 @@
 import React, { Component, HTMLAttributes, ReactNode } from 'react';
-import PropTypes, { Requireable } from 'prop-types';
 import classNames from '../../lib/classNames';
 import { HasPlatform, HasRootRef } from '../../types';
 import withAdaptivity, { ViewWidth, AdaptivityProps } from '../../hoc/withAdaptivity';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface PopoutRootProps extends HTMLAttributes<HTMLDivElement>, HasPlatform, AdaptivityProps, HasRootRef<HTMLDivElement> {
   popout?: ReactNode;
   modal?: ReactNode;
 }
 
-export interface PopoutRootContext {
-  document: Requireable<object>;
-  window: Requireable<object>;
-}
-
-class PopoutRoot extends Component<PopoutRootProps> {
+class PopoutRoot extends Component<PopoutRootProps & FrameProps> {
   static defaultProps: Partial<PopoutRootProps> = {
     popout: null,
   };
-
-  static contextTypes: PopoutRootContext = {
-    window: PropTypes.any,
-    document: PropTypes.any,
-  };
-
-  get document() {
-    return this.context.document || document;
-  }
-
-  get window() {
-    return this.context.window || window;
-  }
 
   componentDidUpdate(prevProps: PopoutRootProps) {
     if (this.props.popout && !prevProps.popout) {
@@ -39,8 +21,8 @@ class PopoutRoot extends Component<PopoutRootProps> {
   }
 
   blurActiveElement() {
-    if (typeof this.window !== 'undefined' && this.document.activeElement) {
-      this.document.activeElement.blur();
+    if (typeof this.props.window !== 'undefined' && this.props.document.activeElement) {
+      (this.props.document.activeElement as HTMLElement).blur();
     }
   }
 
@@ -62,7 +44,6 @@ class PopoutRoot extends Component<PopoutRootProps> {
   }
 }
 
-export default withAdaptivity(PopoutRoot, {
+export default withAdaptivity(withFrame(PopoutRoot), {
   viewWidth: true,
 });
-

@@ -1,5 +1,4 @@
 import React, { Component, CSSProperties, HTMLAttributes, ReactNode, ReactElement } from 'react';
-import PropTypes from 'prop-types';
 import classNames from '../../lib/classNames';
 import { transitionEvent, animationEvent } from '../../lib/supportEvents';
 import getClassName from '../../helpers/getClassName';
@@ -12,6 +11,7 @@ import withContext from '../../hoc/withContext';
 import { ConfigProviderContext, ConfigProviderContextInterface } from '../ConfigProvider/ConfigProviderContext';
 import { createCustomEvent } from '../../lib/utils';
 import { SplitColContext, SplitColContextProps } from '../SplitCol/SplitCol';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export const transitionStartEventName = 'VKUI:View:transition-start';
 export const transitionEndEventName = 'VKUI:View:transition-end';
@@ -88,7 +88,7 @@ export interface ViewState {
   browserSwipe: boolean;
 }
 
-class View extends Component<ViewProps, ViewState> {
+class View extends Component<ViewProps & FrameProps, ViewState> {
   constructor(props: ViewProps) {
     super(props);
 
@@ -117,21 +117,8 @@ class View extends Component<ViewProps, ViewState> {
     history: [],
   };
 
-  static contextTypes = {
-    window: PropTypes.any,
-    document: PropTypes.any,
-  };
-
   private transitionFinishTimeout: ReturnType<typeof setTimeout>;
   private animationFinishTimeout: ReturnType<typeof setTimeout>;
-
-  get document() {
-    return this.context.document || document;
-  }
-
-  get window() {
-    return this.context.window || window;
-  }
 
   get panels(): ReactElement[] {
     return [].concat(this.props.children);
@@ -165,7 +152,7 @@ class View extends Component<ViewProps, ViewState> {
         animated: true,
         scrolls: {
           ...prevState.scrolls,
-          [prevProps.activePanel]: this.window.pageYOffset,
+          [prevProps.activePanel]: this.props.window.pageYOffset,
         },
         isBack,
       });
@@ -186,8 +173,8 @@ class View extends Component<ViewProps, ViewState> {
         visiblePanels: [nextPanel],
         scrolls: removeObjectKeys(prevState.scrolls, [prevState.swipeBackPrevPanel]),
       }, () => {
-        this.document.dispatchEvent(createCustomEvent(this.window, transitionEndEventName));
-        window.scrollTo(0, prevState.scrolls[this.state.activePanel]);
+        this.props.document.dispatchEvent(createCustomEvent(this.props.window, transitionEndEventName));
+        this.props.window.scrollTo(0, prevState.scrolls[this.state.activePanel]);
         prevProps.onTransition && prevProps.onTransition({ isBack: true, from: prevPanel, to: nextPanel });
       });
     }
@@ -196,7 +183,7 @@ class View extends Component<ViewProps, ViewState> {
 
     // Начался переход
     if (!prevState.animated && this.state.animated) {
-      this.document.dispatchEvent(createCustomEvent(this.window, transitionStartEventName, { detail: { scrolls } }));
+      this.props.document.dispatchEvent(createCustomEvent(this.props.window, transitionStartEventName, { detail: { scrolls } }));
       const nextPanelElement = this.pickPanel(this.state.nextPanel);
       const prevPanelElement = this.pickPanel(this.state.prevPanel);
 
@@ -209,7 +196,7 @@ class View extends Component<ViewProps, ViewState> {
 
     // Начался свайп назад
     if (!prevState.swipingBack && this.state.swipingBack) {
-      this.document.dispatchEvent(createCustomEvent(this.window, transitionStartEventName, { detail: { scrolls } }));
+      this.props.document.dispatchEvent(createCustomEvent(this.props.window, transitionStartEventName, { detail: { scrolls } }));
       this.props.onSwipeBackStart && this.props.onSwipeBackStart();
       const nextPanelElement = this.pickPanel(this.state.swipeBackNextPanel);
       const prevPanelElement = this.pickPanel(this.state.swipeBackPrevPanel);
@@ -225,7 +212,7 @@ class View extends Component<ViewProps, ViewState> {
 
     // Если свайп назад отменился (когда пользователь недостаточно сильно свайпнул)
     if (prevState.swipeBackResult === SwipeBackResults.fail && !this.state.swipeBackResult) {
-      this.window.scrollTo(0, scrolls[this.state.activePanel]);
+      this.props.window.scrollTo(0, scrolls[this.state.activePanel]);
     }
 
     // Закончился Safari свайп
@@ -272,19 +259,19 @@ class View extends Component<ViewProps, ViewState> {
   }
 
   blurActiveElement(): void {
-    if (typeof this.window !== 'undefined' && this.document.activeElement) {
-      this.document.activeElement.blur();
+    if (typeof this.props.window !== 'undefined' && this.props.document.activeElement) {
+      (this.props.document.activeElement as HTMLElement).blur();
     }
   }
 
   pickPanel(id: string): HTMLElement {
-    const elem = this.document.getElementById(id);
+    const elem = this.props.document.getElementById(id);
 
     if (!elem) {
       console.warn(`Element #${id} not found`);
     }
 
-    return elem && elem.parentNode.parentNode;
+    return elem && elem.parentElement.parentElement;
   }
 
   transitionEndHandler = (e?: AnimationEvent): void => {
@@ -297,7 +284,7 @@ class View extends Component<ViewProps, ViewState> {
       const activePanel = this.props.activePanel;
       const isBack = this.state.isBack;
       const prevPanel = this.state.prevPanel;
-      this.document.dispatchEvent(createCustomEvent(this.window, transitionEndEventName));
+      this.props.document.dispatchEvent(createCustomEvent(this.props.window, transitionEndEventName));
       this.setState({
         prevPanel: null,
         nextPanel: null,
@@ -307,7 +294,7 @@ class View extends Component<ViewProps, ViewState> {
         isBack: undefined,
         scrolls: isBack ? removeObjectKeys(this.state.scrolls, [prevPanel]) : this.state.scrolls,
       }, () => {
-        isBack && this.window.scrollTo(0, this.state.scrolls[activePanel]);
+        isBack && this.props.window.scrollTo(0, this.state.scrolls[activePanel]);
         this.props.onTransition && this.props.onTransition({ isBack, from: prevPanel, to: activePanel });
       });
     }
@@ -341,7 +328,7 @@ class View extends Component<ViewProps, ViewState> {
       swipebackStartX: 0,
       swipeBackShift: 0,
     }, () => {
-      this.document.dispatchEvent(createCustomEvent(this.window, transitionEndEventName));
+      this.props.document.dispatchEvent(createCustomEvent(this.props.window, transitionEndEventName));
     });
   }
 
@@ -357,7 +344,7 @@ class View extends Component<ViewProps, ViewState> {
 
     const { platform, configProvider } = this.props;
 
-    if (platform === IOS && !configProvider.isWebView && (e.startX <= 70 || e.startX >= this.window.innerWidth - 70) && !this.state.browserSwipe) {
+    if (platform === IOS && !configProvider.isWebView && (e.startX <= 70 || e.startX >= this.props.window.innerWidth - 70) && !this.state.browserSwipe) {
       this.setState({ browserSwipe: true });
     }
 
@@ -375,7 +362,7 @@ class View extends Component<ViewProps, ViewState> {
           swipeBackNextPanel: this.props.history.slice(-2)[0],
           scrolls: {
             ...this.state.scrolls,
-            [this.state.activePanel]: this.window.pageYOffset,
+            [this.state.activePanel]: this.props.window.pageYOffset,
           },
         });
       }
@@ -383,8 +370,8 @@ class View extends Component<ViewProps, ViewState> {
         let swipeBackShift;
         if (e.shiftX < 0) {
           swipeBackShift = 0;
-        } else if (e.shiftX > this.window.innerWidth - this.state.swipebackStartX) {
-          swipeBackShift = this.window.innerWidth;
+        } else if (e.shiftX > this.props.window.innerWidth - this.state.swipebackStartX) {
+          swipeBackShift = this.props.window.innerWidth;
         } else {
           swipeBackShift = e.shiftX;
         }
@@ -398,9 +385,9 @@ class View extends Component<ViewProps, ViewState> {
       const speed = this.state.swipeBackShift / (Date.now() - this.state.startT.getTime()) * 1000;
       if (this.state.swipeBackShift === 0) {
         this.onSwipeBackCancel();
-      } else if (this.state.swipeBackShift >= this.window.innerWidth) {
+      } else if (this.state.swipeBackShift >= this.props.window.innerWidth) {
         this.onSwipeBackSuccess();
-      } else if (speed > 250 || this.state.swipebackStartX + this.state.swipeBackShift > this.window.innerWidth / 2) {
+      } else if (speed > 250 || this.state.swipebackStartX + this.state.swipeBackShift > this.props.window.innerWidth / 2) {
         this.setState({ swipeBackResult: SwipeBackResults.success });
       } else {
         this.setState({ swipeBackResult: SwipeBackResults.fail });
@@ -417,8 +404,8 @@ class View extends Component<ViewProps, ViewState> {
     }
 
     let prevPanelTranslate = `${this.state.swipeBackShift}px`;
-    let nextPanelTranslate = `${-50 + this.state.swipeBackShift * 100 / this.window.innerWidth / 2}%`;
-    let prevPanelShadow = 0.3 * (this.window.innerWidth - this.state.swipeBackShift) / this.window.innerWidth;
+    let nextPanelTranslate = `${-50 + this.state.swipeBackShift * 100 / this.props.window.innerWidth / 2}%`;
+    let prevPanelShadow = 0.3 * (this.props.window.innerWidth - this.state.swipeBackShift) / this.props.window.innerWidth;
 
     if (this.state.swipeBackResult) {
       return isPrev ? { boxShadow: `-2px 0 12px rgba(0, 0, 0, ${prevPanelShadow})` } : {};
@@ -503,7 +490,7 @@ class View extends Component<ViewProps, ViewState> {
 }
 
 export default withContext(withContext(
-  withPlatform(View),
+  withPlatform(withFrame(View)),
   SplitColContext,
   'splitCol',
 ), ConfigProviderContext, 'configProvider');

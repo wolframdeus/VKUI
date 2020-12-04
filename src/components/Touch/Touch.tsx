@@ -1,5 +1,4 @@
 import React, { Component, HTMLAttributes, DragEvent, ElementType, MouseEvent as ReactMouseEvent, RefCallback } from 'react';
-import PropTypes, { Requireable } from 'prop-types';
 import {
   getSupportedEvents,
   coordX,
@@ -11,6 +10,7 @@ import {
 import { HasRootRef } from '../../types';
 import { canUseDOM } from '../../lib/dom';
 import { setRef } from '../../lib/utils';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface TouchProps extends HTMLAttributes<HTMLElement>, HasRootRef<HTMLElement> {
   onEnter?(outputEvent: MouseEvent): void;
@@ -27,10 +27,6 @@ export interface TouchProps extends HTMLAttributes<HTMLElement>, HasRootRef<HTML
   useCapture?: boolean;
   noSlideClick?: boolean;
   Component?: ElementType;
-}
-
-export interface TouchContext {
-  document: Requireable<{}>;
 }
 
 export interface Gesture {
@@ -59,7 +55,7 @@ export type DragHandler = (e: DragEvent<HTMLElement>) => void;
 
 const events = getSupportedEvents();
 
-export default class Touch extends Component<TouchProps> {
+export default withFrame(class Touch extends Component<TouchProps & FrameProps> {
   preventClickDefault = false;
   stopClickPropagation = false;
   gesture: Partial<Gesture> = {};
@@ -71,14 +67,6 @@ export default class Touch extends Component<TouchProps> {
     useCapture: false,
     noSlideClick: false,
   };
-
-  static contextTypes: TouchContext = {
-    document: PropTypes.object,
-  };
-
-  get document() {
-    return this.context.document || document;
-  }
 
   componentDidMount() {
     if (canUseDOM) {
@@ -155,7 +143,7 @@ export default class Touch extends Component<TouchProps> {
       this.props.onStartY(outputEvent);
     }
 
-    !touchEnabled && this.subscribe(this.document);
+    !touchEnabled && this.subscribe(this.props.document);
   };
 
   /**
@@ -264,17 +252,17 @@ export default class Touch extends Component<TouchProps> {
       this.onLeave(e);
     }
 
-    !touchEnabled && this.unsubscribe(this.document);
+    !touchEnabled && this.unsubscribe(this.props.document);
   };
 
-  subscribe(element: HTMLElement) {
+  subscribe(element: HTMLElement | HTMLDocument) {
     const listenerParams = { capture: this.props.useCapture, passive: false };
     element.addEventListener(events[1], this.onMove, listenerParams);
     element.addEventListener(events[2], this.onEnd, listenerParams);
     element.addEventListener(events[3], this.onEnd, listenerParams);
   }
 
-  unsubscribe(element: HTMLElement) {
+  unsubscribe(element: HTMLElement | HTMLDocument) {
     // Здесь нужен последний аргумент с такими же параметрами, потому что
     // некоторые браузеры на странных вендорах типа Meizu не удаляют обработчик.
     // https://github.com/VKCOM/VKUI/issues/444
@@ -348,4 +336,4 @@ export default class Touch extends Component<TouchProps> {
       </Component>
     );
   }
-}
+});

@@ -14,6 +14,7 @@ import withAdaptivity from '../../hoc/withAdaptivity';
 import withPlatform from '../../hoc/withPlatform';
 import CustomSelectOption, { CustomSelectOptionProps } from '../CustomSelectOption/CustomSelectOption';
 import getClassName from '../../helpers/getClassName';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 type SelectValue = SelectHTMLAttributes<HTMLSelectElement>['value'];
 
@@ -39,7 +40,7 @@ export interface CustomSelectProps extends NativeSelectProps {
 
 type MouseEventHandler = (event: MouseEvent<HTMLElement>) => void;
 
-class CustomSelect extends React.Component<CustomSelectProps, CustomSelectState> {
+class CustomSelect extends React.Component<CustomSelectProps & FrameProps, CustomSelectState> {
   static defaultProps = {
     renderOption(props: CustomSelectOptionProps): ReactNode {
       return (
@@ -68,7 +69,7 @@ class CustomSelect extends React.Component<CustomSelectProps, CustomSelectState>
   private keyboardInput: string;
   private node: HTMLLabelElement;
   private selectEl: HTMLSelectElement;
-  private readonly scrollViewRef = createRef<CustomScrollView>();
+  private readonly scrollViewRef = createRef<InstanceType<typeof CustomScrollView>>();
 
   private readonly resetKeyboardInput = () => {
     this.keyboardInput = '';
@@ -292,13 +293,13 @@ class CustomSelect extends React.Component<CustomSelectProps, CustomSelectState>
   handleKeyUp = debounce(this.resetKeyboardInput, 1000);
 
   componentDidMount() {
-    document.addEventListener('click', this.handleDocumentClick, false);
-    document.addEventListener('touchend', this.handleDocumentClick, false);
+    this.props.document.addEventListener('click', this.handleDocumentClick, false);
+    this.props.document.addEventListener('touchend', this.handleDocumentClick, false);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.handleDocumentClick, false);
-    document.removeEventListener('touchend', this.handleDocumentClick, false);
+    this.props.document.removeEventListener('click', this.handleDocumentClick, false);
+    this.props.document.removeEventListener('touchend', this.handleDocumentClick, false);
   }
 
   componentDidUpdate(prevProps: CustomSelectProps) {
@@ -411,6 +412,6 @@ class CustomSelect extends React.Component<CustomSelectProps, CustomSelectState>
   }
 }
 
-export default withPlatform(withAdaptivity(CustomSelect, {
+export default withPlatform(withAdaptivity(withFrame(CustomSelect), {
   sizeY: true,
 }));

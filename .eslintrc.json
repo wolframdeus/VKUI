@@ -24,6 +24,10 @@
     "@typescript-eslint/no-magic-numbers": "off",
     "@typescript-eslint/no-unused-vars": ["error", {
       "ignoreRestSiblings": true
-    }]
+    }],
+    "no-restricted-globals": ["error",
+      { "name": "window", "message": "Use hoc/withFrame" },
+      { "name": "document", "message": "Use hoc/withFrame" }
+    ]
   }
 }

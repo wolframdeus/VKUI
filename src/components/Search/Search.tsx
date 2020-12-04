@@ -20,6 +20,7 @@ import { VKUITouchEvent } from '../../lib/touch';
 import { setRef } from '../../lib/utils';
 import Text from '../Typography/Text/Text';
 import { Separator } from '../../index';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 let searchId = 0;
 
@@ -40,7 +41,7 @@ export interface SearchState {
   focused?: boolean;
 }
 
-class Search extends Component<SearchProps, SearchState> {
+class Search extends Component<SearchProps & FrameProps, SearchState> {
   static defaultProps: SearchProps = {
     autoComplete: 'off',
     placeholder: 'Поиск',
@@ -95,7 +96,7 @@ class Search extends Component<SearchProps, SearchState> {
 
   onCancel: VoidFunction = () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(this.props.window.HTMLInputElement.prototype, 'value').set;
     nativeInputValueSetter.call(this.inputEl, '');
 
     const ev2 = new Event('input', { bubbles: true });
@@ -193,4 +194,4 @@ class Search extends Component<SearchProps, SearchState> {
   }
 }
 
-export default withPlatform(Search);
+export default withPlatform(withFrame(Search));

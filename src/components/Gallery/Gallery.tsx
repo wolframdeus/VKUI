@@ -367,13 +367,13 @@ class BaseGallery extends Component<BaseGalleryProps & FrameProps, GalleryState>
   }
 }
 
-const Gallery = withFrame<GalleryProps>(({
+const Gallery = withFrame(({
   initialSlideIndex = 0,
   children,
   timeout,
   onChange,
   ...props
-}) => {
+}: GalleryProps & FrameProps) => {
   const [localSlideIndex, setSlideIndex] = useState(initialSlideIndex);
   const isControlled = typeof props.slideIndex === 'number';
   const slideIndex = isControlled ? props.slideIndex : localSlideIndex;

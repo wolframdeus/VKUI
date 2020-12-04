@@ -1,9 +1,9 @@
 import React, { ReactElement, ReactNode, Component, Fragment, RefCallback } from 'react';
-import PropTypes, { Requireable } from 'prop-types';
 import classNames from '../../lib/classNames';
 import getClassName from '../../helpers/getClassName';
 import ReactDOM from 'react-dom';
 import { canUseDOM } from '../../lib/dom';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 interface TooltipPortalProps extends Partial<TooltipProps> {
   target?: HTMLElement;
@@ -12,10 +12,6 @@ interface TooltipPortalProps extends Partial<TooltipProps> {
 interface TooltipPortalState {
   x: number;
   y: number;
-}
-
-interface TooltipPortalContextType {
-  document: Requireable<{}>;
 }
 
 type GetBoundingTargetRect = () => {
@@ -31,7 +27,7 @@ const isDOMTypeElement = (element: ReactElement) => {
 
 const baseClassName = getClassName('Tooltip');
 
-class TooltipPortal extends Component<TooltipPortalProps, TooltipPortalState> {
+const TooltipPortal = withFrame(class TooltipPortal extends Component<TooltipPortalProps & FrameProps, TooltipPortalState> {
   constructor(props: TooltipPortalProps) {
     super(props);
 
@@ -54,14 +50,6 @@ class TooltipPortal extends Component<TooltipPortalProps, TooltipPortalState> {
     this.portalTarget = closestFixed || closestHeader || closestPanel;
   }
 
-  static contextTypes: TooltipPortalContextType = {
-    document: PropTypes.object,
-  };
-
-  get document() {
-    return this.context.document || document;
-  }
-
   fixedPortal: boolean;
 
   el: HTMLDivElement;
@@ -82,14 +70,14 @@ class TooltipPortal extends Component<TooltipPortalProps, TooltipPortalState> {
   };
 
   componentWillUnmount() {
-    this.document.removeEventListener('click', this.props.onClose);
+    this.props.document.removeEventListener('click', this.props.onClose);
   }
 
   componentDidMount() {
     const { offsetY, offsetX, alignX, alignY } = this.props;
     const coords = this.getBoundingTargetRect();
 
-    this.document.addEventListener('click', this.props.onClose);
+    this.props.document.addEventListener('click', this.props.onClose);
 
     this.setState({
       x: coords.x + offsetX + (alignX === 'right' ? coords.width - this.el.offsetWidth : 0),
@@ -122,7 +110,7 @@ class TooltipPortal extends Component<TooltipPortalProps, TooltipPortalState> {
         </div>
       </div>, this.portalTarget);
   }
-}
+});
 
 export interface TooltipProps {
   /**

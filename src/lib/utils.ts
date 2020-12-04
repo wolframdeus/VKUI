@@ -11,6 +11,7 @@ export function isFunction(value: any): value is ((...args: any[]) => any) {
   return typeof value === 'function';
 }
 
+// eslint-disable-next-line no-restricted-globals
 export function throttle(fn: any, threshhold = 50, scope = window) {
   let last: number;
   let deferTimer: any;
@@ -33,6 +34,7 @@ export function throttle(fn: any, threshhold = 50, scope = window) {
   };
 }
 
+// eslint-disable-next-line no-restricted-globals
 export function debounce(fn: any, delay: number, context = window) {
   let timeout: any;
   let args: any[] = null;
@@ -81,7 +83,7 @@ export function createCustomEvent(window: any, type: string, eventInitDict?: any
   if (typeof window.CustomEvent !== 'function') {
     const options = eventInitDict || { bubbles: false, cancelable: false, detail: null };
 
-    const evt = document.createEvent('CustomEvent');
+    const evt = window.document.createEvent('CustomEvent');
     evt.initCustomEvent(
       type,
       options.bubbles,

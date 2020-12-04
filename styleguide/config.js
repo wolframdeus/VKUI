@@ -1,4 +1,5 @@
 const path = require('path');
+const { DefinePlugin } = require('webpack');
 const webpackConfig = require('../webpack.config');
 const merge = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -237,6 +238,9 @@ module.exports = {
       new MiniCssExtractPlugin({
         filename: '[name].css',
       }),
+      new DefinePlugin({
+        '__isVkuiStyleguide': 'true',
+      })
     ],
     resolve: {
       alias: {

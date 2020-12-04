@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { DOMProps, HasChildren } from '../../types';
 import { hasMouse as _hasMouse } from '@vkontakte/vkjs/lib/InputUtils';
 import { AdaptivityContext, AdaptivityContextInterface, SizeType, ViewHeight, ViewWidth } from './AdaptivityContext';
+import { withFrame } from '../../hoc/withFrame';
 
 export interface AdaptivityProviderProps extends AdaptivityContextInterface, HasChildren, DOMProps {}
 
@@ -13,7 +14,7 @@ export const MOBILE_SIZE = 320;
 export const MOBILE_LANDSCAPE_HEIGHT = 414;
 export const MEDIUM_HEIGHT = 720;
 
-export default function AdaptivityProvider(props: AdaptivityProviderProps) {
+const AdaptivityProvider = withFrame((props: AdaptivityProviderProps) => {
   const adaptivityRef = useRef<AdaptivityContextInterface>(null);
   const [, updateAdaptivity] = useState({});
 
@@ -59,11 +60,9 @@ export default function AdaptivityProvider(props: AdaptivityProviderProps) {
   return <AdaptivityContext.Provider value={adaptivityRef.current}>
     {props.children}
   </AdaptivityContext.Provider>;
-}
+});
 
-AdaptivityProvider.defaultProps = {
-  window: window,
-};
+export default AdaptivityProvider;
 
 function calculateAdaptivity(windowWidth: number, windowHeight: number, props: AdaptivityProviderProps) {
   let viewWidth = ViewWidth.SMALL_MOBILE;

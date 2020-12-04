@@ -96,10 +96,6 @@ class Snackbar extends PureComponent<SnackbarProps, SnackbarState> {
     this.clearCloseTimeout();
   }
 
-  get window() {
-    return this.context.window || window;
-  }
-
   setCloseTimeout = () => {
     if (canUseDOM) {
       this.closeTimeout = setTimeout(() => {

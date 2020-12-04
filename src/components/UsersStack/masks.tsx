@@ -2,12 +2,13 @@ import { canUseDOM, onDOMLoaded } from '../../lib/dom';
 
 let masksCreated = false;
 
-export function createMasks(): void {
+/* eslint-disable-next-line no-restricted-globals */
+export function createMasks(doc = document): void {
   if (!canUseDOM || masksCreated) {
     return;
   }
 
-  const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const svgElement = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svgElement.setAttributeNS(null, 'id', '__SVG_MASKS_NODE__');
   svgElement.setAttributeNS(null, 'width', '0');
   svgElement.setAttributeNS(null, 'height', '0');
@@ -34,7 +35,7 @@ export function createMasks(): void {
 </defs>`;
 
   onDOMLoaded(() => {
-    document.body.appendChild(svgElement);
+    doc.body.appendChild(svgElement);
   });
   masksCreated = true;
 }

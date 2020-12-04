@@ -16,6 +16,7 @@ export interface AnimateArgumentsInterface {
 }
 
 export default function animate({ duration, timing, draw }: AnimateArgumentsInterface): void {
+  /* eslint-disable no-restricted-globals */
   if (typeof window === 'undefined') {
     return;
   }

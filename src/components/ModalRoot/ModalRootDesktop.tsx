@@ -15,6 +15,7 @@ import {
 import { ModalsStateEntry, ModalType } from './types';
 import { ANDROID, VKCOM } from '../../lib/platform';
 import getClassName from '../../helpers/getClassName';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface ModalRootProps extends HasChildren, HasPlatform {
   activeModal?: string | null;
@@ -41,7 +42,7 @@ interface ModalRootState {
   inited?: boolean;
 }
 
-class ModalRootDesktopComponent extends Component<ModalRootProps, ModalRootState> {
+class ModalRootDesktopComponent extends Component<ModalRootProps & FrameProps, ModalRootState> {
   constructor(props: ModalRootProps) {
     super(props);
 
@@ -82,14 +83,6 @@ class ModalRootDesktopComponent extends Component<ModalRootProps, ModalRootState
     document: PropTypes.any,
   };
 
-  get document(): Document {
-    return this.context.document || document;
-  }
-
-  get window(): Window {
-    return this.context.window || window;
-  }
-
   get modals() {
     return [].concat(this.props.children);
   }
@@ -121,11 +114,11 @@ class ModalRootDesktopComponent extends Component<ModalRootProps, ModalRootState
 
   componentDidMount() {
     this.initActiveModal();
-    document.addEventListener('keydown', this.handleKeyDownEsc);
+    this.props.document.addEventListener('keydown', this.handleKeyDownEsc);
   }
 
   componentWillUnmount = () => {
-    document.removeEventListener('keydown', this.handleKeyDownEsc);
+    this.props.document.removeEventListener('keydown', this.handleKeyDownEsc);
   };
 
   componentDidUpdate(prevProps: ModalRootProps, prevState: ModalRootState) {
@@ -174,7 +167,7 @@ class ModalRootDesktopComponent extends Component<ModalRootProps, ModalRootState
   }
 
   pickModal(modalId: string) {
-    return this.document.getElementById('modal-' + modalId);
+    return this.props.document.getElementById('modal-' + modalId);
   }
 
   /**
@@ -459,4 +452,7 @@ class ModalRootDesktopComponent extends Component<ModalRootProps, ModalRootState
   }
 }
 
-export const ModalRootDesktop = withContext(withPlatform(ModalRootDesktopComponent), ConfigProviderContext, 'configProvider');
+export const ModalRootDesktop = withContext(
+  withPlatform(withFrame(ModalRootDesktopComponent)),
+  ConfigProviderContext,
+  'configProvider');

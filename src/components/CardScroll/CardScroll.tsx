@@ -1,12 +1,13 @@
-import React, { FunctionComponent, HTMLAttributes, useRef, ReactElement } from 'react';
+import React, { HTMLAttributes, useRef, ReactElement } from 'react';
 import classNames from '../../lib/classNames';
 import getClassname from '../../helpers/getClassName';
 import usePlatform from '../../hooks/usePlatform';
 import HorizontalScroll from '../HorizontalScroll/HorizontalScroll';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export type CardScrollProps = HTMLAttributes<HTMLDivElement>;
 
-const CardScroll: FunctionComponent<CardScrollProps> = ({ children, className, style, ...restProps }: CardScrollProps) => {
+const CardScroll = withFrame(({ children, className, style, window, ...restProps }: CardScrollProps & FrameProps) => {
   const platform = usePlatform();
 
   const refs = useRef<HTMLElement[]>(new Array(React.Children.count(children)));
@@ -59,6 +60,6 @@ const CardScroll: FunctionComponent<CardScrollProps> = ({ children, className, s
       </HorizontalScroll>
     </div>
   );
-};
+});
 
 export default CardScroll;

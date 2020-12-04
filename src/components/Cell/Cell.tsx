@@ -1,5 +1,4 @@
 import React, { Component, ReactNode, MouseEvent, Fragment, InputHTMLAttributes } from 'react';
-import PropTypes from 'prop-types';
 import classNames from '../../lib/classNames';
 import getClassName from '../../helpers/getClassName';
 import IconButton from '../IconButton/IconButton';
@@ -13,6 +12,7 @@ import withPlatform from '../../hoc/withPlatform';
 import SimpleCell, { SimpleCellProps } from '../SimpleCell/SimpleCell';
 import { HasPlatform } from '../../types';
 import { setRef } from '../../lib/utils';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface CellProps extends SimpleCellProps, HasPlatform, Pick<InputHTMLAttributes<HTMLInputElement>, 'name' | 'checked' | 'defaultChecked'> {
   /**
@@ -56,7 +56,7 @@ export interface CellState {
   checked?: boolean;
 }
 
-class Cell extends Component<CellProps, CellState> {
+class Cell extends Component<CellProps & FrameProps, CellState> {
   constructor(props: CellProps) {
     super(props);
 
@@ -74,22 +74,16 @@ class Cell extends Component<CellProps, CellState> {
     removePlaceholder: 'Удалить',
   };
 
-  static contextTypes = {
-    document: PropTypes.any,
-  };
-
-  get document() {return this.context.document || document;}
-
   private readonly onRemoveActivateClick = (e: MouseEvent) => {
     e.nativeEvent.stopPropagation();
     e.preventDefault();
     this.setState({ isRemoveActivated: true });
-    this.document.addEventListener('click', this.deactivateRemove);
+    this.props.document.addEventListener('click', this.deactivateRemove);
   };
 
   deactivateRemove = () => {
     this.setState({ isRemoveActivated: false, removeOffset: 0 });
-    this.document.removeEventListener('click', this.deactivateRemove);
+    this.props.document.removeEventListener('click', this.deactivateRemove);
   };
 
   private readonly onRemoveClick = (e: MouseEvent) => {
@@ -99,7 +93,7 @@ class Cell extends Component<CellProps, CellState> {
   };
 
   componentWillUnmount() {
-    this.document.removeEventListener('click', this.deactivateRemove);
+    this.props.document.removeEventListener('click', this.deactivateRemove);
   }
 
   componentDidUpdate(_prevProps: CellProps, prevState: CellState) {
@@ -284,4 +278,4 @@ class Cell extends Component<CellProps, CellState> {
   }
 }
 
-export default withPlatform(Cell);
+export default withPlatform(withFrame(Cell));

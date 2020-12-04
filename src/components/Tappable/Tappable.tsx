@@ -11,6 +11,7 @@ import withPlatform from '../../hoc/withPlatform';
 import { hasHover } from '@vkontakte/vkjs/lib/InputUtils';
 import { setRef } from '../../lib/utils';
 import withAdaptivity, { AdaptivityProps } from '../../hoc/withAdaptivity';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface TappableProps extends HTMLAttributes<HTMLElement>, HasRootRef<HTMLElement>, HasPlatform, AdaptivityProps {
   Component?: ElementType;
@@ -70,7 +71,7 @@ function deactivateOtherInstances(exclude?: string) {
   });
 }
 
-class Tappable extends Component<TappableProps, TappableState> {
+class Tappable extends Component<TappableProps & FrameProps, TappableState> {
   constructor(props: TappableProps) {
     super(props);
     this.id = Math.round(Math.random() * 1e8).toString(16);
@@ -119,7 +120,7 @@ class Tappable extends Component<TappableProps, TappableState> {
 
     storage[this.id] = {
       stop: this.stop,
-      activeTimeout: window.setTimeout(this.start, ACTIVE_DELAY),
+      activeTimeout: this.props.window.setTimeout(this.start, ACTIVE_DELAY),
     };
   };
 
@@ -153,7 +154,7 @@ class Tappable extends Component<TappableProps, TappableState> {
         this.stop();
       } else {
         // Короткий тап, оставляем подсветку
-        const timeout = window.setTimeout(this.stop, this.props.activeEffectDelay - now + this.state.ts);
+        const timeout = this.props.window.setTimeout(this.stop, this.props.activeEffectDelay - now + this.state.ts);
         const store = this.getStorage();
 
         if (store) {
@@ -164,7 +165,7 @@ class Tappable extends Component<TappableProps, TappableState> {
       // Очень короткий тап, включаем подсветку
       this.start();
 
-      const timeout = window.setTimeout(this.stop, this.props.activeEffectDelay);
+      const timeout = this.props.window.setTimeout(this.stop, this.props.activeEffectDelay);
 
       if (this.getStorage()) {
         clearTimeout(this.getStorage().activeTimeout);
@@ -199,7 +200,7 @@ class Tappable extends Component<TappableProps, TappableState> {
         };
       });
 
-      this.wavesTimeout = window.setTimeout(() => {
+      this.wavesTimeout = this.props.window.setTimeout(() => {
         this.setState((state: TappableState): TappableState => {
           let clicks = { ...state.clicks };
           delete clicks[key];
@@ -352,4 +353,4 @@ class Tappable extends Component<TappableProps, TappableState> {
   }
 }
 
-export default withAdaptivity(withPlatform(Tappable), { sizeX: true });
+export default withAdaptivity(withPlatform(withFrame(Tappable)), { sizeX: true });

@@ -1,6 +1,5 @@
 import React, { HTMLAttributes, RefCallback } from 'react';
 import getClassName from '../../helpers/getClassName';
-import PropTypes, { Requireable } from 'prop-types';
 import classNames from '../../lib/classNames';
 import { transitionEndEventName, TransitionStartEventDetail, transitionStartEventName } from '../View/View';
 import withContext from '../../hoc/withContext';
@@ -9,6 +8,7 @@ import withPlatform from '../../hoc/withPlatform';
 import withPanelContext from '../Panel/withPanelContext';
 import { setRef } from '../../lib/utils';
 import { SplitColContext, SplitColContextProps } from '../SplitCol/SplitCol';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface FixedLayoutProps extends
   HTMLAttributes<HTMLDivElement>,
@@ -36,12 +36,7 @@ export interface FixedLayoutState {
   width: string;
 }
 
-export interface FixedLayoutContext {
-  document: Requireable<{}>;
-  window: Requireable<Window>;
-}
-
-class FixedLayout extends React.Component<FixedLayoutProps, FixedLayoutState> {
+class FixedLayout extends React.Component<FixedLayoutProps & FrameProps, FixedLayoutState> {
   state: FixedLayoutState = {
     position: 'absolute',
     top: null,
@@ -50,35 +45,22 @@ class FixedLayout extends React.Component<FixedLayoutProps, FixedLayoutState> {
 
   el: HTMLDivElement;
 
-  static contextTypes: FixedLayoutContext = {
-    document: PropTypes.any,
-    window: PropTypes.any,
-  };
-
   private onMountResizeTimeout: number;
-
-  get document() {
-    return this.context.document || document;
-  }
-
-  get window() {
-    return this.context.window || window;
-  }
 
   componentDidMount() {
     this.onMountResizeTimeout = setTimeout(() => this.doResize());
-    this.window.addEventListener('resize', this.doResize);
+    this.props.window.addEventListener('resize', this.doResize);
 
-    this.document.addEventListener(transitionStartEventName, this.onViewTransitionStart);
-    this.document.addEventListener(transitionEndEventName, this.onViewTransitionEnd);
+    this.props.document.addEventListener(transitionStartEventName, this.onViewTransitionStart);
+    this.props.document.addEventListener(transitionEndEventName, this.onViewTransitionEnd);
   }
 
   componentWillUnmount() {
     clearInterval(this.onMountResizeTimeout);
-    this.window.removeEventListener('resize', this.doResize);
+    this.props.window.removeEventListener('resize', this.doResize);
 
-    this.document.removeEventListener(transitionStartEventName, this.onViewTransitionStart);
-    this.document.removeEventListener(transitionEndEventName, this.onViewTransitionEnd);
+    this.props.document.removeEventListener(transitionStartEventName, this.onViewTransitionStart);
+    this.props.document.removeEventListener(transitionEndEventName, this.onViewTransitionEnd);
   }
 
   onViewTransitionStart: EventListener = (e: CustomEvent<TransitionStartEventDetail>) => {
@@ -136,7 +118,7 @@ class FixedLayout extends React.Component<FixedLayoutProps, FixedLayoutState> {
 }
 
 export default withContext(
-  withPlatform(withPanelContext(FixedLayout)),
+  withPlatform(withPanelContext(withFrame(FixedLayout))),
   SplitColContext,
   'splitCol',
 );

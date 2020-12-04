@@ -1,5 +1,4 @@
 import React, { Component, HTMLAttributes, ReactElement, ReactNode } from 'react';
-import PropTypes, { Requireable } from 'prop-types';
 import classNames from '../../lib/classNames';
 import getClassName from '../../helpers/getClassName';
 import { animationEvent } from '../../lib/supportEvents';
@@ -9,6 +8,7 @@ import withContext from '../../hoc/withContext';
 import { HasPlatform } from '../../types';
 import { ConfigProviderContext, ConfigProviderContextInterface } from '../ConfigProvider/ConfigProviderContext';
 import { SplitColContextProps, SplitColContext } from '../SplitCol/SplitCol';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface RootProps extends HTMLAttributes<HTMLDivElement>, HasPlatform {
   activeView: string;
@@ -39,12 +39,7 @@ export interface RootState {
   transition: boolean;
 }
 
-export interface RootContext {
-  document: Requireable<object>;
-  window: Requireable<object>;
-}
-
-class Root extends Component<RootProps, RootState> {
+class Root extends Component<RootProps & FrameProps, RootState> {
   constructor(props: RootProps) {
     super(props);
 
@@ -63,20 +58,7 @@ class Root extends Component<RootProps, RootState> {
     popout: null,
   };
 
-  static contextTypes: RootContext = {
-    window: PropTypes.any,
-    document: PropTypes.any,
-  };
-
   private animationFinishTimeout: ReturnType<typeof setTimeout>;
-
-  get document() {
-    return this.context.document || document;
-  }
-
-  get window() {
-    return this.context.window || window;
-  }
 
   get arrayChildren() {
     return [].concat(this.props.children);
@@ -89,7 +71,7 @@ class Root extends Component<RootProps, RootState> {
 
     // Нужен переход
     if (this.props.activeView !== prevProps.activeView) {
-      let pageYOffset = this.window.pageYOffset;
+      let pageYOffset = this.props.window.pageYOffset;
       const firstLayerId = [].concat(prevProps.children).find((view: ReactElement) => {
         return view.props.id === prevProps.activeView || view.props.id === this.props.activeView;
       }).props.id;
@@ -116,8 +98,8 @@ class Root extends Component<RootProps, RootState> {
 
     // Начался переход
     if (!prevState.transition && this.state.transition) {
-      const prevViewElement = this.document.getElementById(`view-${this.state.prevView}`);
-      const nextViewElement = this.document.getElementById(`view-${this.state.nextView}`);
+      const prevViewElement = this.props.document.getElementById(`view-${this.state.prevView}`);
+      const nextViewElement = this.props.document.getElementById(`view-${this.state.nextView}`);
 
       prevViewElement.querySelector('.View__panel').scrollTop = this.state.scrolls[this.state.prevView];
 
@@ -166,15 +148,15 @@ class Root extends Component<RootProps, RootState> {
         transition: false,
         isBack: undefined,
       }, () => {
-        this.window.scrollTo(0, isBack ? this.state.scrolls[this.state.activeView] : 0);
+        this.props.window.scrollTo(0, isBack ? this.state.scrolls[this.state.activeView] : 0);
         this.props.onTransition && this.props.onTransition({ isBack, from: prevView, to: nextView });
       });
     }
   };
 
   blurActiveElement() {
-    if (typeof this.window !== 'undefined' && this.document.activeElement) {
-      this.document.activeElement.blur();
+    if (typeof this.props.window !== 'undefined' && this.props.document.activeElement) {
+      (this.props.document.activeElement as HTMLElement).blur();
     }
   }
 
@@ -214,7 +196,7 @@ class Root extends Component<RootProps, RootState> {
 }
 
 export default withContext(withContext(
-  withPlatform(Root),
+  withPlatform(withFrame(Root)),
   SplitColContext,
   'splitCol',
 ), ConfigProviderContext, 'configProvider');

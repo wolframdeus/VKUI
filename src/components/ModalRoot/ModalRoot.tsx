@@ -1,5 +1,4 @@
 import React, { Component, ReactElement, SyntheticEvent } from 'react';
-import PropTypes from 'prop-types';
 import Touch, { TouchEvent } from '../Touch/Touch';
 import TouchRootContext from '../Touch/TouchContext';
 import getClassName from '../../helpers/getClassName';
@@ -20,6 +19,7 @@ import {
 } from '../ConfigProvider/ConfigProviderContext';
 import { ModalsState, ModalsStateEntry, ModalType, TranslateRange } from './types';
 import { MODAL_PAGE_DEFAULT_PERCENT_HEIGHT } from './constants';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 function numberInRange(number: number, range: TranslateRange) {
   return number >= range[0] && number <= range[1];
@@ -56,7 +56,7 @@ interface ModalRootState {
   dragging?: boolean;
 }
 
-class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> {
+class ModalRootTouchComponent extends Component<ModalRootProps & FrameProps, ModalRootState> {
   constructor(props: ModalRootProps) {
     super(props);
 
@@ -98,19 +98,6 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
   private readonly frameIds: {
     [index: string]: number;
   };
-
-  static contextTypes = {
-    window: PropTypes.any,
-    document: PropTypes.any,
-  };
-
-  get document(): Document {
-    return this.context.document || document;
-  }
-
-  get window(): Window {
-    return this.context.window || window;
-  }
 
   getModals(): ReactElement[] {
     return [].concat(this.props.children);
@@ -206,9 +193,9 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
       // некоторые браузеры на странных вендорах типа Meizu не удаляют обработчик.
       // https://github.com/VKCOM/VKUI/issues/444
       // @ts-ignore (В интерфейсе EventListenerOptions нет поля passive)
-      this.window.removeEventListener('touchmove', this.preventTouch, { passive: false });
+      this.props.window.removeEventListener('touchmove', this.preventTouch, { passive: false });
     } else {
-      this.window.addEventListener('touchmove', this.preventTouch, { passive: false });
+      this.props.window.addEventListener('touchmove', this.preventTouch, { passive: false });
     }
   }
 
@@ -226,7 +213,7 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
   };
 
   pickModal(modalId: string) {
-    return this.document.getElementById('modal-' + modalId);
+    return this.props.document.getElementById('modal-' + modalId);
   }
 
   /**
@@ -456,7 +443,7 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
 
       !this.state.dragging && this.setState({ dragging: true });
 
-      const shiftYPercent = shiftY / this.window.innerHeight * 100;
+      const shiftYPercent = shiftY / this.props.window.innerHeight * 100;
       const shiftYCurrent = rubber(shiftYPercent, 72, 0.8, this.props.platform === ANDROID || this.props.platform === VKCOM);
 
       modalState.touchShiftYPercent = shiftYPercent;
@@ -512,7 +499,7 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
     let setStateCallback;
 
     if (this.state.dragging) {
-      const shiftYEndPercent = (startY + shiftY) / this.window.innerHeight * 100;
+      const shiftYEndPercent = (startY + shiftY) / this.props.window.innerHeight * 100;
 
       let translateY = modalState.translateYCurrent;
       const expectTranslateY = translateY / (Date.now() - modalState.touchStartTime.getTime()) * 240 * 0.6 * (modalState.touchShiftYPercent < 0 ? -1 : 1);
@@ -605,7 +592,7 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
 
       clearTimeout(modalState.contentScrollStopTimeout);
 
-      modalState.contentScrollStopTimeout = window.setTimeout(() => {
+      modalState.contentScrollStopTimeout = this.props.window.setTimeout(() => {
         if (modalState.contentScrolled) {
           modalState.contentScrolled = false;
         }
@@ -841,4 +828,8 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
   }
 }
 
-export const ModalRootTouch = withContext(withPlatform(ModalRootTouchComponent), ConfigProviderContext, 'configProvider');
+export const ModalRootTouch = withContext(
+  withPlatform(withFrame(ModalRootTouchComponent)),
+  ConfigProviderContext,
+  'configProvider',
+);

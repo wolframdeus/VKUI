@@ -6,6 +6,7 @@ import { setRef } from '../../lib/utils';
 import withAdaptivity, { AdaptivityProps } from '../../hoc/withAdaptivity';
 import { getClassName, HasPlatform } from '../..';
 import withPlatform from '../../hoc/withPlatform';
+import { FrameProps, withFrame } from '../../hoc/withFrame';
 
 export interface TextareaProps extends
   TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -23,7 +24,7 @@ export interface TextareaState {
   height?: number;
 }
 
-class Textarea extends PureComponent<TextareaProps, TextareaState> {
+class Textarea extends PureComponent<TextareaProps & FrameProps, TextareaState> {
   constructor(props: TextareaProps) {
     super(props);
 
@@ -62,7 +63,7 @@ class Textarea extends PureComponent<TextareaProps, TextareaState> {
 
     if (el) {
       const { offsetHeight, scrollHeight } = el;
-      const style = window.getComputedStyle(el);
+      const style = this.props.window.getComputedStyle(el);
       const paddingTop = parseInt(style.paddingTop);
       const paddingBottom = parseInt(style.paddingBottom);
 
@@ -107,7 +108,7 @@ class Textarea extends PureComponent<TextareaProps, TextareaState> {
   componentDidUpdate(prevProps: TextareaProps) {
     if (prevProps.value && this.props.value === '') {
       // Fix iOS extra indent on removing content
-      window.requestAnimationFrame(() => {
+      this.props.window.requestAnimationFrame(() => {
         this.element.value = '';
       });
     }
@@ -137,6 +138,6 @@ class Textarea extends PureComponent<TextareaProps, TextareaState> {
     );
   }
 }
-export default withPlatform(withAdaptivity(Textarea, {
+export default withPlatform(withAdaptivity(withFrame(Textarea), {
   sizeY: true,
 }));
