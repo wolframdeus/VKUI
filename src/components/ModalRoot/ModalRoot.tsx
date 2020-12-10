@@ -21,6 +21,8 @@ import {
 import { ModalsState, ModalsStateEntry, ModalType, TranslateRange } from './types';
 import { MODAL_PAGE_DEFAULT_PERCENT_HEIGHT } from './constants';
 
+type NativeTouchEvent = InstanceType<typeof window['TouchEvent']> & { originalEvent?: NativeTouchEvent };
+
 function numberInRange(number: number, range: TranslateRange) {
   return number >= range[0] && number <= range[1];
 }
@@ -108,7 +110,7 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
     return this.context.document || document;
   }
 
-  get window(): Window {
+  get window(): typeof window {
     return this.context.window || window;
   }
 
@@ -212,7 +214,10 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
     }
   }
 
-  preventTouch = (event: any) => {
+  preventTouch = (event: NativeTouchEvent) => {
+    if (event.target instanceof this.window.Element && event.target.closest('.ModalRoot')) {
+      return undefined;
+    }
     if (!event) {
       return false;
     }
@@ -415,9 +420,6 @@ class ModalRootTouchComponent extends Component<ModalRootProps, ModalRootState> 
     const target = originalEvent.target as HTMLElement;
 
     if (!event.isY) {
-      if (target.closest('.ModalPage')) {
-        originalEvent.preventDefault();
-      }
       return;
     }
 

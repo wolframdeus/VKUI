@@ -118,10 +118,18 @@ const App = withAdaptivity(class App extends React.Component {
             <CellButton onClick={() => this.setActiveModal(MODAL_PAGE_STORY_FEEDBACK)}>Просмотры истории</CellButton>
             <CellButton onClick={() => this.setActiveModal(MODAL_PAGE_USER_INFO)}>Информация о пользователе</CellButton>
 
-            <FormItem top="Страна">            
+            <HorizontalScroll showArrows getScrollToLeft={i => i - 120} getScrollToRight={i => i + 120}>
+              <div style={{ display: 'flex' }}>
+                {getRandomUsers(15).map((item) => (
+                  <HorizontalCell key={item.id} header={item.first_name}><Avatar size={56} src={item.photo_200} /></HorizontalCell>)
+                )}
+              </div>
+            </HorizontalScroll>
+
+            <FormItem top="Страна">
               <SelectMimicry placeholder="Выбрать страну" onClick={() => this.setActiveModal(MODAL_PAGE_COUNTRIES)} />
             </FormItem>
-            <FormItem top="Город">            
+            <FormItem top="Город">
               <SelectMimicry placeholder="Выбрать город" disabled />
             </FormItem>
 
@@ -131,10 +139,10 @@ const App = withAdaptivity(class App extends React.Component {
               <Radio name="sex" value={2}>Женский</Radio>
             </FormItem>
 
-            <FormItem top="Школа">            
+            <FormItem top="Школа">
               <SelectMimicry placeholder="Выбрать школу" disabled />
             </FormItem>
-            <FormItem top="Университет">            
+            <FormItem top="Университет">
               <SelectMimicry placeholder="Выбрать университет" disabled />
             </FormItem>
 
@@ -151,12 +159,12 @@ const App = withAdaptivity(class App extends React.Component {
             </FormItem>
 
             <FormItem top="Дата рождения">
-              <DatePicker 
-                min={{day: 1, month: 1, year: 1901}} 
+              <DatePicker
+                min={{day: 1, month: 1, year: 1901}}
                 max={{day: 1, month: 1, year: 2006}}
                 dayPlaceholder="Д"
                 monthPlaceholder="ММ"
-                yearPlaceholder="ГГ" 
+                yearPlaceholder="ГГ"
               />
             </FormItem>
           </Group>
