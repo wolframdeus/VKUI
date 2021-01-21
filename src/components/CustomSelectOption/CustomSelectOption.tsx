@@ -19,6 +19,8 @@ const CustomSelectOption: FC<CustomSelectOptionProps> = ({
   before,
   after,
   className,
+  option,
+  focused,
   ...restProps
 }: CustomSelectOptionProps) => {
   const title = typeof children === 'string' ? children : null;
