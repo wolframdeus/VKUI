@@ -8,6 +8,7 @@ import { canUseDOM } from '../../lib/dom';
 import { setRef } from '../../lib/utils';
 import withAdaptivity, { AdaptivityProps } from '../../hoc/withAdaptivity';
 import { precisionRound } from '../../helpers/math';
+import './Slider.css';
 
 export interface SliderProps extends
   HasRootRef<HTMLDivElement>,

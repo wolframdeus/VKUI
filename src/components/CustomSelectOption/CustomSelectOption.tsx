@@ -3,6 +3,7 @@ import { Icon16Done } from '@vkontakte/icons';
 import classNames from '../../lib/classNames';
 import { hasReactNode } from '../../lib/utils';
 import Text from '../Typography/Text/Text';
+import './CustomSelectOption.css';
 
 export interface CustomSelectOptionProps extends HTMLAttributes<HTMLDivElement> {
   option?: any;

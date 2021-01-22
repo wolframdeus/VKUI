@@ -10,6 +10,7 @@ import { ConfigProviderContext, WebviewType } from '../ConfigProvider/ConfigProv
 import withAdaptivity, { AdaptivityProps, SizeType } from '../../hoc/withAdaptivity';
 import { isPrimitiveReactNode } from '../../lib/utils';
 import Text from '../Typography/Text/Text';
+import './PanelHeader.css';
 
 export interface PanelHeaderProps extends
   HTMLAttributes<HTMLDivElement>,

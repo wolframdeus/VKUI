@@ -3,6 +3,7 @@ import getClassName from '../../helpers/getClassName';
 import classNames from '../../lib/classNames';
 import withPlatform from '../../hoc/withPlatform';
 import { HasPlatform } from '../../types';
+import './ActionSheet.css';
 
 interface Props extends HasPlatform {
   closing: boolean;

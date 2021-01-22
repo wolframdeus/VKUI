@@ -12,6 +12,7 @@ import Subhead from '../Typography/Subhead/Subhead';
 import Title from '../Typography/Title/Title';
 import ModalDismissButton from '../ModalDismissButton/ModalDismissButton';
 import ModalRootContext from '../ModalRoot/ModalRootContext';
+import './ModalCard.css';
 
 export interface ModalCardProps extends HTMLAttributes<HTMLElement>, HasPlatform, AdaptivityProps {
   /**

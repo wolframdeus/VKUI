@@ -6,6 +6,7 @@ import { hasReactNode } from '../../lib/utils';
 import Subhead from '../Typography/Subhead/Subhead';
 import Caption from '../Typography/Caption/Caption';
 import withAdaptivity, { AdaptivityProps } from '../../hoc/withAdaptivity';
+import './FormItem.css';
 
 export interface FormItemProps extends AllHTMLAttributes<HTMLElement> {
   top?: ReactNode;

@@ -1,4 +1,5 @@
 import React, { createRef } from 'react';
+import './CustomScrollView.css';
 
 interface Props {
   windowResize?: boolean;

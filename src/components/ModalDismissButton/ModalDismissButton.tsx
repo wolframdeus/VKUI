@@ -4,6 +4,7 @@ import Tappable from '../Tappable/Tappable';
 import getClassName from '../../helpers/getClassName';
 import classNames from '../../lib/classNames';
 import usePlatform from '../../hooks/usePlatform';
+import './ModalDismissButton.css';
 
 export type ModalDismissButtonProps = HTMLAttributes<HTMLButtonElement>;
 

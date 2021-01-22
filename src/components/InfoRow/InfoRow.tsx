@@ -5,6 +5,7 @@ import classNames from '../../lib/classNames';
 import usePlatform from '../../hooks/usePlatform';
 import Headline from '../Typography/Headline/Headline';
 import { hasReactNode } from '../../lib/utils';
+import './InfoRow.css';
 
 export interface InfoRowProps extends HTMLAttributes<HTMLDivElement> {
   header: ReactNode;

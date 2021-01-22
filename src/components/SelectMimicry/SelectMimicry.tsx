@@ -9,6 +9,7 @@ import { getClassName } from '../..';
 import Headline from '../Typography/Headline/Headline';
 import Text from '../Typography/Text/Text';
 import { VKCOM } from '../../lib/platform';
+import '../Select/Select.css';
 
 export interface SelectMimicryProps extends
   HTMLAttributes<HTMLElement>,
@@ -68,4 +69,3 @@ export default withAdaptivity(SelectMimicry, {
   sizeX: true,
   sizeY: true,
 });
-

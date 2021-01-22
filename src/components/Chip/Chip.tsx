@@ -3,6 +3,7 @@ import classNames from '../../lib/classNames';
 import { Icon16Cancel } from '@vkontakte/icons';
 import { getTitleFromChildren, hasReactNode, noop } from '../../lib/utils';
 import Caption from '../Typography/Caption/Caption';
+import './Chip.css';
 
 type ChipValue = string | number;
 

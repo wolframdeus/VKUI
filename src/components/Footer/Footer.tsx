@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 import classNames from '../../lib/classNames';
 import { DivProps } from '../Div/Div';
 import Caption from '../Typography/Caption/Caption';
+import './Footer.css';
 
 const Footer: FunctionComponent<DivProps> = ({ className, children, ...restProps }: DivProps) => {
   return (

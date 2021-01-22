@@ -4,6 +4,7 @@ import PopoutWrapper from '../PopoutWrapper/PopoutWrapper';
 import getClassName from '../../helpers/getClassName';
 import classNames from '../../lib/classNames';
 import usePlatform from '../../hooks/usePlatform';
+import './ScreenSpinner.css';
 
 interface ScreenSpinnerProps extends HTMLAttributes<HTMLDivElement>, SpinnerProps {}
 

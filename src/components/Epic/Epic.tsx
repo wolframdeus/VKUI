@@ -4,6 +4,7 @@ import classNames from '../../lib/classNames';
 import usePlatform from '../../hooks/usePlatform';
 import withAdaptivity, { ViewWidth, AdaptivityProps } from '../../hoc/withAdaptivity';
 import { ScrollSaver } from './ScrollSaver';
+import './Epic.css';
 
 export interface EpicProps extends HTMLAttributes<HTMLDivElement>, AdaptivityProps {
   tabbar?: ReactNode;

@@ -9,6 +9,7 @@ import { HasPlatform } from '../../types';
 import { leadingZero } from '../../lib/utils';
 import classNames from '../../lib/classNames';
 import CustomSelect, { SelectOption } from '../CustomSelect/CustomSelect';
+import './DatePicker.css';
 
 const DefaultMonths: string[] = [
   'Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря',

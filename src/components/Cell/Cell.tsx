@@ -10,6 +10,7 @@ import SimpleCell, { SimpleCellProps } from '../SimpleCell/SimpleCell';
 import { HasPlatform } from '../../types';
 import { setRef } from '../../lib/utils';
 import { DOMProps, withDOM } from '../../lib/dom';
+import './Cell.css';
 
 export interface CellProps extends SimpleCellProps, HasPlatform {
   /**

@@ -3,6 +3,7 @@ import usePlatform from '../../../hooks/usePlatform';
 import classNames from '../../../lib/classNames';
 import getClassName from '../../../helpers/getClassName';
 import { ANDROID } from '../../../lib/platform';
+import './Text.css';
 
 export interface TextProps extends AllHTMLAttributes<HTMLElement> {
   weight: 'regular' | 'medium' | 'semibold';

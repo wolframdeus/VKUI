@@ -6,6 +6,7 @@ import { HasRef } from '../../types';
 import { isPrimitiveReactNode } from '../../lib/utils';
 import { VKCOM } from '../../lib/platform';
 import Separator from '../Separator/Separator';
+import './ModalPageHeader.css';
 
 export interface ModalPageHeaderProps extends HTMLAttributes<HTMLDivElement>, HasRef<HTMLDivElement> {
   /**

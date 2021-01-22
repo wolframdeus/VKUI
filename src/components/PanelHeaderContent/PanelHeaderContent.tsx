@@ -6,6 +6,7 @@ import usePlatform from '../../hooks/usePlatform';
 import { hasReactNode } from '../../lib/utils';
 import Caption from '../Typography/Caption/Caption';
 import Headline from '../Typography/Headline/Headline';
+import './PanelHeaderContent.css';
 
 interface PanelHeaderContentProps extends HTMLAttributes<HTMLDivElement> {
   aside?: ReactNode;

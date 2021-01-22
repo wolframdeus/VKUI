@@ -9,6 +9,7 @@ import withPanelContext from '../Panel/withPanelContext';
 import { setRef } from '../../lib/utils';
 import { SplitColContext, SplitColContextProps } from '../SplitCol/SplitCol';
 import { DOMProps, withDOM } from '../../lib/dom';
+import './FixedLayout.css';
 
 export interface FixedLayoutProps extends
   HTMLAttributes<HTMLDivElement>,
