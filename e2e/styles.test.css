@@ -1,4 +1,5 @@
-@import '../src/styles/styles.css';
+/* we do not necessarily have index.ts imported in test suites */
+@import '../src/styles/global.css';
 
 @font-face {
   font-family: 'Roboto';
