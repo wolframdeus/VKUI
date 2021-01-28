@@ -1,6 +1,6 @@
 const path = require('path');
 const merge = require('webpack-merge');
-const babelGlobalCss = require('./babel.global-css.config');
+const babelCssModules = require('./babel.css-modules.config');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -21,7 +21,7 @@ const config = {
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-          options: babelGlobalCss
+          options: babelCssModules
         }
       },
       {
@@ -34,6 +34,19 @@ const config = {
             name: '[name].[hash:8].[ext]',
           },
         },
+      },
+      {
+        test: /\.css$/,
+        use: [{
+          loader: 'style-loader',
+          options: {
+            // singleton is faster, but does not support sourcemaps
+            injectType: isProduction ? 'singletonStyleTag' : 'styleTag',
+            attributes: {
+              class: 'vkui-style'
+            },
+          },
+        }, 'css-loader', 'postcss-loader']
       },
     ],
   },
